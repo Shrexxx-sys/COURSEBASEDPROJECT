@@ -169,7 +169,7 @@
                     const payload = JSON.stringify({ text: textToTranslate });
                     // Use an absolute URL so the frontend can call the backend even when opened via file://
                     // (recommended: serve the frontend over http and open http://localhost:3000/transcript.html)
-                    const response = await fetch('http://localhost:5000/api/translate', {
+                    const response = await fetch('https://coursebackend-do0q.onrender.com/api/translate', {
                         method: 'POST',
                         headers: {
                             // include charset so servers and proxies treat this as UTF-8
