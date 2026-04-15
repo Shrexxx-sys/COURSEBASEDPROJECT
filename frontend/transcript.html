@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscribe - Hindi to English Transcription</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        /* Apply the Inter font to the whole page */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+        }
+
+        /* Re-add your original animations */
+        @keyframes subpage-fade-in-up {
+            from { opacity: 0; transform: translateY(1rem); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .subpage-anim {
+            opacity: 0;
+            animation: subpage-fade-in-up 0.6s ease-out forwards;
+        }
+        .subpage-anim-1 { animation-delay: 0.1s; }
+        .subpage-anim-2 { animation-delay: 0.2s; }
+        .subpage-anim-3 { animation-delay: 0.3s; }
+    </style>
+</head>
+
+<body class="bg-black text-white antialiased">
+
+    <section id="transcription-page" class="min-h-screen w-full flex flex-col p-4 sm:p-8">
+
+        <header class="w-full max-w-5xl mx-auto flex justify-between items-center py-4 shrink-0 subpage-anim subpage-anim-1">
+            <h2 class="text-2xl sm:text-3xl font-bold text-left">"Why type when you can talk?"</h2>
+            <a href="main.html" class="text-gray-400 hover:text-white transition-colors duration-300">
+                Back to Home &rarr;
+            </a>
+        </header>
+
+        <div class="flex-grow flex items-center justify-center w-full subpage-anim subpage-anim-2">
+            <div class="bg-gradient-to-br from-gray-900 via-black to-gray-900 border border-gray-700 rounded-xl p-6 sm:p-8 max-w-3xl w-full space-y-8">
+                
+                <!-- Step 1: Record Hindi -->
+                <div>
+                    <h3 class="font-semibold text-lg text-white mb-4">Record Hindi</h3>
+                    <div class="flex flex-col items-center space-y-4">
+                        <button id="record-btn" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-300 flex items-center space-x-2 text-lg w-full justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-mic-fill" viewBox="0 0 16 16">
+                                <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z" />
+                                <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z" />
+                            </svg>
+                            <span>Start Recording</span>
+                        </button>
+                        <p id="status" class="text-sm text-gray-400">Click "Start Recording" to begin.</p>
+                    </div>
+                </div>
+
+                <!-- Step 2: Display Original Hindi -->
+                <div>
+                    <h3 class="font-semibold text-lg text-white mb-4">Original Hindi Transcription</h3>
+                    <div id="hindi-output" class="text-gray-200 p-4 bg-gray-900 rounded-lg min-h-[100px] whitespace-pre-wrap">
+                        Your recognized Hindi text will appear here...
+                    </div>
+                </div>
+
+                <!-- Step 3: Display English Translation -->
+                <div>
+                    <h3 class="font-semibold text-lg text-white mb-4">English Translation Output</h3>
+                    <div id="translation-output" class="text-gray-200 p-4 bg-gray-900 rounded-lg min-h-[100px] whitespace-pre-wrap">
+                        Your English translation will appear here...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="w-full max-w-5xl mx-auto text-center py-4 text-gray-500 text-sm shrink-0 subpage-anim subpage-anim-3">
+            &copy; 2025 Subscribe.Shrey Vishal Dave.Saketh Ram M. All rights reserved.
+        </footer>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const recordBtn = document.getElementById('record-btn');
+            const statusDiv = document.getElementById('status');
+            const hindiOutputDiv = document.getElementById('hindi-output');
+            const translationOutputDiv = document.getElementById('translation-output');
+            
+            // This uses the free, built-in browser API
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                statusDiv.textContent = "Sorry, your browser does not support Speech Recognition. Please use Google Chrome.";
+                recordBtn.disabled = true;
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'hi-IN'; // Listen for Hindi
+            recognition.interimResults = false; // We only want the final, complete sentence
+            recognition.continuous = false; // Stop listening after the user stops talking
+
+            let isRecording = false;
+
+            recognition.onstart = () => {
+                isRecording = true;
+                statusDiv.textContent = "Listening... Speak a phrase in Hindi.";
+                recordBtn.querySelector('span').textContent = 'Listening...';
+                recordBtn.disabled = true; // Disable button while listening
+                hindiOutputDiv.textContent = '...';
+                translationOutputDiv.textContent = '...';
+            };
+
+            recognition.onend = () => {
+                isRecording = false;
+                recordBtn.querySelector('span').textContent = 'Start Recording';
+                recordBtn.disabled = false; // Re-enable button
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech Recognition Error", event);
+                statusDiv.textContent = 'Error: ' + event.error + '. Please try again.';
+            };
+            
+            // This is where the magic happens
+            recognition.onresult = (event) => {
+                // Pick the best alternative from the recognition result (prefer highest confidence when available)
+                const alternatives = Array.from(event.results[0]);
+                let best = alternatives[0];
+                if (alternatives.length > 1) {
+                    // choose the alternative with the highest numeric confidence if provided
+                    best = alternatives.reduce((a, b) => {
+                        if (typeof a.confidence === 'number' && typeof b.confidence === 'number') {
+                            return a.confidence >= b.confidence ? a : b;
+                        }
+                        return a; // fall back to the first alternative if confidence not available
+                    });
+                }
+
+                // Get transcript and normalize Unicode (NFC) to avoid composition issues
+                let hindiText = (best && best.transcript) ? best.transcript : (alternatives[0] && alternatives[0].transcript) || '';
+                if (hindiText && typeof hindiText.normalize === 'function') {
+                    hindiText = hindiText.normalize('NFC');
+                }
+                // Basic cleanup
+                hindiText = hindiText.replace(/\s+/g, ' ').trim();
+
+                // Display the Hindi text and optional confidence
+                const confText = (typeof best.confidence === 'number') ? ` (confidence ${Math.round(best.confidence * 100)}%)` : '';
+                hindiOutputDiv.textContent = hindiText + confText;
+
+                statusDiv.textContent = `Recognized Hindi. Now translating to English...`;
+
+                // Now, send this Hindi text to our new, free backend
+                translateText(hindiText);
+            };
+
+            // This function sends the text to your backend
+            async function translateText(textToTranslate) {
+                try {
+                    // This is the call to YOUR backend server
+                    // Send UTF-8 JSON and explicitly set charset
+                    const payload = JSON.stringify({ text: textToTranslate });
+                    // Use an absolute URL so the frontend can call the backend even when opened via file://
+                    // (recommended: serve the frontend over http and open http://localhost:3000/transcript.html)
+                    const response = await fetch('http://localhost:5000/api/translate', {
+                        method: 'POST',
+                        headers: {
+                            // include charset so servers and proxies treat this as UTF-8
+                            'Content-Type': 'application/json; charset=utf-8',
+                        },
+                        // Some environments mis-handle charset; ensure body bytes are UTF-8
+                        // send a JSON string — express.json() expects text/json
+                        body: payload,
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Backend server returned an error.');
+                    }
+
+                    const data = await response.json();
+                    
+                    // Display the English translation in its own box
+                    translationOutputDiv.textContent = data.translation;
+                    statusDiv.textContent = 'Translation complete. Click "Start Recording" to go again.';
+
+                } catch (error) {
+                    console.error('Translation error:', error);
+                    translationOutputDiv.textContent = 'Sorry, an error occurred during translation.';
+                    statusDiv.textContent = 'Translation failed. Please try again.';
+                }
+            }
+
+            // The button only starts the recording process
+            recordBtn.addEventListener('click', () => {
+                if (!isRecording) {
+                    recognition.start();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+

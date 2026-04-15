@@ -1,0 +1,6 @@
+index.js loaded — beginning startup
+✅ Translation server is running on port 5000
+Startup complete — PID 19528. Visit http://localhost:5000/health to verify.
+[REQ] 2025-10-21T10:25:25.917Z POST /api/translate body: { text: 'नमसत दनय' }
+Incoming text to translate: नमसत दनय
+Google Translate response (snippet): Namaste danay
